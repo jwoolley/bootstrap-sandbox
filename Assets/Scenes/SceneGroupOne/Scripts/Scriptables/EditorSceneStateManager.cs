@@ -1,7 +1,8 @@
 using GameUtils;
 using UnityEditor;
 using UnityEngine;
-namespace com.pseudochaos.EditorScripts {
+
+namespace org.pseudochaos.EditorScripts {
 #if UNITY_EDITOR
     [FilePath("Experimental/SceneState.editorprefs", FilePathAttribute.Location.PreferencesFolder)]
     class EditorSceneStateManager : ScriptableSingleton<EditorSceneStateManager> {
@@ -17,6 +18,9 @@ namespace com.pseudochaos.EditorScripts {
         [SerializeField]
         private bool isRedirectQueued;
 
+        [SerializeField]
+        SceneAsset bootstrapScene;
+
         public bool isAutoSceneRedirectionEnabled() {
             return isRedirectionEnabled;
         }
@@ -28,6 +32,11 @@ namespace com.pseudochaos.EditorScripts {
         public string getRedirectSceneAssetPath() {
             return redirectSceneAssetPath;
         }
+
+        public string getBootstrapSceneAssetPath() {
+            return AssetDatabase.GetAssetPath(bootstrapScene);
+        }
+
         public void queueSceneRedirect(string redirectSceneAssetPath) {
             Logger.Log($"Queuing scene redirect {redirectSceneAssetPath}");
             this.redirectSceneAssetPath = redirectSceneAssetPath;
@@ -36,6 +45,10 @@ namespace com.pseudochaos.EditorScripts {
 
         public void clear() {
             this.redirectSceneAssetPath = string.Empty;
+            isRedirectQueued = false;
+        }
+
+        public void clearQueuedRedirect() {
             isRedirectQueued = false;
         }
     }
@@ -69,9 +82,20 @@ namespace com.pseudochaos.EditorScripts {
             return string.Empty;
 #endif
         }
-        public static void queueSceneRedirect(string redirectSceneAssetPath) {
+
+        public static string getBootstrapSceneAssetPath() {
 #if UNITY_EDITOR
-            EditorSceneStateManager.instance.queueSceneRedirect(redirectSceneAssetPath);
+            return EditorSceneStateManager.instance.getBootstrapSceneAssetPath();
+#else
+            Logger.LogWarning("Unexpected call to geBootstrapSceneAssetPath(): not in editor mode");
+            return string.Empty;
+#endif
+        }
+
+        public static void queueRedirectToCurrentScene() {
+#if UNITY_EDITOR
+            string bootstrapScenePath = getBootstrapSceneAssetPath();
+            EditorSceneStateManager.instance.queueSceneRedirect(UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene().path);
 #else
             Logger.LogWarning("Unable to queue scene redirect: not in editor mode");
 #endif
@@ -82,6 +106,13 @@ namespace com.pseudochaos.EditorScripts {
             EditorSceneStateManager.instance.clear();
 #else
             Logger.LogWarning("Unable to clear state: not in editor mode");
+#endif
+        }
+
+        public static void redirectToSceneInPlayMode(string scenePath) {
+            UnityEngine.SceneManagement.SceneManager.LoadScene(scenePath);
+#if UNITY_EDITOR
+            EditorSceneStateManager.instance.clearQueuedRedirect();
 #endif
         }
     }

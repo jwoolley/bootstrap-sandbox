@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ddf06763e5b5704bb4a2479b45c6a2e, type: 3}
   m_Name: EditorSceneStateManager
   m_EditorClassIdentifier: 
-  isRedirectionEnabled: 0
-  redirectSceneAssetPath: SOME/FAKE/PATH
-  isRedirectQueued: 1
+  isRedirectionEnabled: 1
+  redirectSceneAssetPath: 
+  isRedirectQueued: 0
+  bootstrapScene: {fileID: 102900000, guid: 2cda990e2423bbf4892e6590ba056729, type: 3}

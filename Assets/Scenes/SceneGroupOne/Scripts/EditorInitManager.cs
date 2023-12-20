@@ -1,7 +1,5 @@
-using com.pseudochaos.EditorScripts;
+using org.pseudochaos.EditorScripts;
 using GameUtils;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EditorInitManager : MonoBehaviour {
@@ -12,17 +10,20 @@ public class EditorInitManager : MonoBehaviour {
           + $"  isSceneRedirectQueued: {RuntimeSafeEditorSceneStateManager.isAutoSceneRedirectionEnabled()}"
           + $"  getRedirectSceneAssetPath: {RuntimeSafeEditorSceneStateManager.getRedirectSceneAssetPath()}");
 
-        RuntimeSafeEditorSceneStateManager.queueSceneRedirect("SOME/OTHER/FAKE/PATH");
+        // TODO: this does *NOT* belong here. the real call should go in an InitializeOnLoad script. just testing!ss
+        // RuntimeSafeEditorSceneStateManager.queueRedirectToCurrentScene();
+        if (RuntimeSafeEditorSceneStateManager.isAutoSceneRedirectionEnabled() && RuntimeSafeEditorSceneStateManager.isSceneRedirectQueued()) {
+            RuntimeSafeEditorSceneStateManager.redirectToSceneInPlayMode(RuntimeSafeEditorSceneStateManager.getRedirectSceneAssetPath());
+        }
     }
 
     // Start is called before the first frame update
     void Start() {
-        
+
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        
+    void Update() {
+
     }
 }
